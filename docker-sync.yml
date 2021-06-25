@@ -1,0 +1,5 @@
+version: "2"
+syncs:
+  nrf52-hrs:
+    sync_strategy: native_osx
+    src: '/Users/akbardhanaliwala/Projects/open_source/fw/demo-nrf52-hrs'
