@@ -1,0 +1,9 @@
+[LAGER]
+
+[DEVENV]
+image = lagerdata/devenv-cortexm-nrf52
+mount_dir = /app
+shell = /bin/bash
+cmd.build = cd examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc;make
+cmd.clean = cd examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc;make clean
+
