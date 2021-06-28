@@ -27,10 +27,10 @@ jobs:
           name: app_hexfile
           path: examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build/nrf52840_xxaa.hex
 
-      - name: Upload shell test
+      - name: Upload ble test
         uses: actions/upload-artifact@v2
         with:
-          name: test_shell
+          name: test_ble
           path: tests/main.py
 
 
@@ -66,10 +66,10 @@ jobs:
           entrypoint: /usr/local/bin/lager
           args: flash --hexfile /github/workspace/nrf52840_xxaa.hex
 
-      - name: Download shell test
+      - name: Download ble test
         uses: actions/download-artifact@v2
         with:
-          name: test_shell
+          name: test_ble
 
       - name: Test BLE
         uses: docker://lagerdata/lager-cli
