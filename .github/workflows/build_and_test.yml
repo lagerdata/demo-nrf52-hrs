@@ -19,7 +19,7 @@ jobs:
         uses: docker://lagerdata/devenv-cortexm-nrf52
         with:
           entrypoint: /usr/local/bin/lager
-          args: exec build- 
+          args: exec build
 
       - name: Upload the app hexfile
         uses: actions/upload-artifact@v2
