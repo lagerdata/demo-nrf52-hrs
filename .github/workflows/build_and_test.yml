@@ -1,0 +1,81 @@
+name: Workflow for building and running some simple hardware tests
+on: [push]
+env:
+  LAGER_GATEWAY: 45
+concurrency: 
+  group: dut
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: Build Project
+        uses: docker://lagerdata/devenv-cortexm-nrf52
+        with:
+          entrypoint: /usr/local/bin/lager
+          args: exec build- 
+
+      - name: Upload the app hexfile
+        uses: actions/upload-artifact@v2
+        with:
+          name: app_hexfile
+          path: examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build/nrf52840_xxaa.hex
+
+      - name: Upload shell test
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_shell
+          path: tests/main.py
+
+
+  connect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect to gateway
+        uses: docker://lagerdata/lager-cli
+        env:
+          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}     #This is setup inside GitHub see https://docs.lagerdata.com/ci/github_actions.html     
+        with:
+          entrypoint: /usr/local/bin/lager
+          args: connect --device nrf52 --force
+
+
+  flash: #Only proceed to this step if the build and connect jobs succeeded 
+    runs-on: ubuntu-latest
+    needs: [build, connect]
+    steps:
+
+      - name: Download the app hexfile
+        uses: actions/download-artifact@v2
+        with:
+          name: app_hexfile
+
+      - name: Flash Device
+        uses: docker://lagerdata/lager-cli
+        env:
+          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+        with:
+          entrypoint: /usr/local/bin/lager
+          args: flash --hexfile /github/workspace/nrf52840_xxaa.hex
+
+      - name: Download shell test
+        uses: actions/download-artifact@v2
+        with:
+          name: test_shell
+
+      - name: Test Shell
+        uses: docker://lagerdata/lager-cli
+        env:
+          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+        with:
+          entrypoint: /usr/local/bin/lager
+          args: python main.py
