@@ -71,7 +71,7 @@ jobs:
         with:
           name: test_shell
 
-      - name: Test Shell
+      - name: Test BLE
         uses: docker://lagerdata/lager-cli
         env:
           LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
