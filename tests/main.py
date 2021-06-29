@@ -6,7 +6,16 @@ HRM_SERVICE = "0000180d-0000-1000-8000-00805f9b34fb"
 HRM_BODY_SENSOR_LOCATION_CHAR =  "00002a38-0000-1000-8000-00805f9b34fb"
 HRM_MEASUREMENT_CHAR =  "00002a37-0000-1000-8000-00805f9b34fb"
 
+BLE_HRS_BODY_SENSOR_LOCATION_OTHER = 0
+BLE_HRS_BODY_SENSOR_LOCATION_FOOT = 6
 
+HRS_LOCATIONS = {0: 'BLE_HRS_BODY_SENSOR_LOCATION_OTHER',
+  1: 'BLE_HRS_BODY_SENSOR_LOCATION_CHEST',
+  2: 'BLE_HRS_BODY_SENSOR_LOCATION_WRIST',
+  3: 'BLE_HRS_BODY_SENSOR_LOCATION_FINGER',
+  4: 'BLE_HRS_BODY_SENSOR_LOCATION_HAND',
+  5: 'BLE_HRS_BODY_SENSOR_LOCATION_EAR_LOBE',
+  6: 'BLE_HRS_BODY_SENSOR_LOCATION_FOOT'}
 
 BATTERY_SERVICE = "0000180f-0000-1000-8000-00805f9b34fb"
 BATTERY_LEVEL_CHAR = "00002a19-0000-1000-8000-00805f9b34fb"
@@ -60,9 +69,18 @@ def main():
                 assert char.properties[0] == 'notify'
             if char.uuid == HRM_BODY_SENSOR_LOCATION_CHAR:
                 assert char.properties[0] == 'read'
-                val = client.read_gatt_char(HRM_BODY_SENSOR_LOCATION_CHAR)
-                print(val)
 
+        val = int.from_bytes(client.read_gatt_char(HRM_BODY_SENSOR_LOCATION_CHAR),"little")
+        print(HRS_LOCATIONS.get(val))
+        assert val > BLE_HRS_BODY_SENSOR_LOCATION_OTHER
+        assert val < (BLE_HRS_BODY_SENSOR_LOCATION_FOOT + 1)
+
+        try:
+            timed_out, messages = client.start_notify(HRM_MEASUREMENT_CHAR, hrm_notify_cb, max_messages=5, timeout=10)
+            if timed_out:
+                raise SystemExit("Heart Rate Notifications Failed")
+        finally:
+            client.stop_notify(HRM_MEASUREMENT_CHAR)
         print("Heart Rate Measurement Service Verified")
 
 
@@ -77,6 +95,18 @@ def main():
                 assert char.properties[0] == 'read'
                 assert char.properties[1] == 'notify'
 
+
+        val = int.from_bytes(client.read_gatt_char(BATTERY_LEVEL_CHAR),"little")
+        print(f"Battery Level:{val}")
+        assert val <= 100
+        assert val >= 20
+        try:
+            timed_out, messages = client.start_notify(BATTERY_LEVEL_CHAR, batt_notify_cb, max_messages=2, timeout=30)
+            if timed_out:
+                raise SystemExit("Battery Level Notifications Failed")
+        finally:
+            client.stop_notify(BATTERY_LEVEL_CHAR)
+
         print("Battery Service verified")
 
         di_service = services.get_service(DEVICE_INFORMATION_SERVICE)
@@ -88,10 +118,22 @@ def main():
             if char.uuid == MFG_NAME_STRING_CHAR:
                 assert char.properties[0] == 'read'
 
+        val = client.read_gatt_char(MFG_NAME_STRING_CHAR).decode("utf-8")
+        print(f"Manufacturer String:{val}")
+        assert val == 'NordicSemiconductor'
         print("Device Information Serivce verified")
 
     print("Brilliant!")
     dut.close()
+
+
+
+def hrm_notify_cb(handle: int, data: bytearray):
+    print(f"Received Heart Rate Measurement: {data}")
+
+def batt_notify_cb(handle: int, data: bytearray):
+    val = int.from_bytes(data, "little")
+    print(f"Received Battery Level: {val}")
 
 if __name__ == '__main__':
      main()
