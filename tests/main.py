@@ -73,7 +73,7 @@ def main():
         val = int.from_bytes(client.read_gatt_char(HRM_BODY_SENSOR_LOCATION_CHAR),"little")
         print(HRS_LOCATIONS.get(val))
         assert val > BLE_HRS_BODY_SENSOR_LOCATION_OTHER
-        assert val < (BLE_HRS_BODY_SENSOR_LOCATION_FOOT + 1)
+        assert val <= (BLE_HRS_BODY_SENSOR_LOCATION_FOOT)
 
         try:
             timed_out, messages = client.start_notify(HRM_MEASUREMENT_CHAR, hrm_notify_cb, max_messages=5, timeout=10)

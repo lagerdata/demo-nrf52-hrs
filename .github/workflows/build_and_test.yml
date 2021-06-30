@@ -18,7 +18,7 @@ jobs:
       - name: Build Project
         uses: docker://lagerdata/devenv-cortexm-nrf52
         with:
-          entrypoint: /usr/local/bin/lager
+          entrypoint: lager
           args: exec build
 
       - name: Upload the app hexfile
@@ -43,7 +43,7 @@ jobs:
           LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
           LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}     #This is setup inside GitHub see https://docs.lagerdata.com/ci/github_actions.html     
         with:
-          entrypoint: /usr/local/bin/lager
+          entrypoint: lager
           args: connect --device nrf52 --force
 
 
@@ -62,7 +62,7 @@ jobs:
           LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
           LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
         with:
-          entrypoint: /usr/local/bin/lager
+          entrypoint: lager
           args: flash --hexfile /github/workspace/nrf52840_xxaa.hex
 
   test_ble: #test basic BLE functionality
@@ -80,5 +80,5 @@ jobs:
           LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
           LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
         with:
-          entrypoint: /usr/local/bin/lager
+          entrypoint: lager
           args: python main.py
