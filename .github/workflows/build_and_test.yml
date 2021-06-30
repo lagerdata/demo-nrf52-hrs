@@ -27,6 +27,12 @@ jobs:
           name: app_hexfile
           path: examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build/nrf52840_xxaa.hex
 
+      - name: Upload the softdevice hexfile
+        uses: actions/upload-artifact@v2
+        with:
+          name: softdevice_hexfile
+          path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+
       - name: Upload ble test
         uses: actions/upload-artifact@v2
         with:
@@ -56,7 +62,21 @@ jobs:
         with:
           name: app_hexfile
 
-      - name: Flash Device
+      - name: Download the softdevice hexfile
+        uses: actions/download-artifact@v2
+        with:
+          name: softdevice_hexfile
+
+      - name: Flash Softdevice
+        uses: docker://lagerdata/lager-cli
+        env:
+          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+        with:
+          entrypoint: lager
+          args: flash --hexfile /github/workspace/s140_nrf52_7.2.0_softdevice.hex
+
+      - name: Flash App
         uses: docker://lagerdata/lager-cli
         env:
           LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
