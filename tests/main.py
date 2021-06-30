@@ -72,8 +72,7 @@ def main():
 
         val = int.from_bytes(client.read_gatt_char(HRM_BODY_SENSOR_LOCATION_CHAR),"little")
         print(HRS_LOCATIONS.get(val))
-        assert val > BLE_HRS_BODY_SENSOR_LOCATION_OTHER
-        assert val <= (BLE_HRS_BODY_SENSOR_LOCATION_FOOT)
+        assert BLE_HRS_BODY_SENSOR_LOCATION_OTHER < val <= (BLE_HRS_BODY_SENSOR_LOCATION_FOOT)
 
         try:
             timed_out, messages = client.start_notify(HRM_MEASUREMENT_CHAR, hrm_notify_cb, max_messages=5, timeout=10)
@@ -98,8 +97,7 @@ def main():
 
         val = int.from_bytes(client.read_gatt_char(BATTERY_LEVEL_CHAR),"little")
         print(f"Battery Level:{val}")
-        assert val <= 100
-        assert val >= 20
+        assert 20 <= val <= 100
         try:
             timed_out, messages = client.start_notify(BATTERY_LEVEL_CHAR, batt_notify_cb, max_messages=2, timeout=30)
             if timed_out:
