@@ -75,9 +75,10 @@ def main():
         assert BLE_HRS_BODY_SENSOR_LOCATION_OTHER < val <= (BLE_HRS_BODY_SENSOR_LOCATION_FOOT)
 
         try:
-            timed_out, messages = client.start_notify(HRM_MEASUREMENT_CHAR, hrm_notify_cb, max_messages=5, timeout=10)
+            timed_out, messages = client.start_notify(HRM_MEASUREMENT_CHAR, max_messages=5, timeout=10)
             if timed_out:
                 raise SystemExit("Heart Rate Notifications Failed")
+            print(messages)
         finally:
             client.stop_notify(HRM_MEASUREMENT_CHAR)
         print("Heart Rate Measurement Service Verified")
@@ -99,9 +100,10 @@ def main():
         print(f"Battery Level:{val}")
         assert 20 <= val <= 100
         try:
-            timed_out, messages = client.start_notify(BATTERY_LEVEL_CHAR, batt_notify_cb, max_messages=2, timeout=30)
+            timed_out, messages = client.start_notify(BATTERY_LEVEL_CHAR, max_messages=2, timeout=30)
             if timed_out:
                 raise SystemExit("Battery Level Notifications Failed")
+            print(messages)
         finally:
             client.stop_notify(BATTERY_LEVEL_CHAR)
 
@@ -126,12 +128,7 @@ def main():
 
 
 
-def hrm_notify_cb(handle: int, data: bytearray):
-    print(f"Received Heart Rate Measurement: {data}")
 
-def batt_notify_cb(handle: int, data: bytearray):
-    val = int.from_bytes(data, "little")
-    print(f"Received Battery Level: {val}")
 
 if __name__ == '__main__':
      main()
