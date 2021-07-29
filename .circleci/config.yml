@@ -3,14 +3,16 @@ version: 2.1
 jobs:
   build:
     docker:
-      -image: docker://lagerdata/devenv-cortexm-nrf52:version-1.6
+      - image: lagerdata/devenv-cortexm-nrf52:version-1.6
     working_directory: /app
     steps:
       - checkout
       - run: lager exec build
-      - store_artifacts: /app/examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build/nrf52840_xxaa.hex
-      - destination: app-hex
+      - store_artifacts:
+          path: examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build
+          destination: nrf52840_xxaa.hex
 
 workflows:
-  jobs:
-    - build
+  main:
+    jobs:
+      - build
