@@ -6,7 +6,7 @@ jobs:
       - image: lagerdata/devenv-cortexm-nrf52:version-1.6
     working_directory: /app
     steps:
-      - apt-get install -y git
+      - run: apt-get install -y git
       - checkout
       - run: lager exec build
       - store_artifacts:
