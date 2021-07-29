@@ -10,3 +10,7 @@ jobs:
       - run: lager exec build
       - store_artifacts: /app/examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build/nrf52840_xxaa.hex
       - destination: app-hex
+
+workflows:
+  jobs:
+    - build
