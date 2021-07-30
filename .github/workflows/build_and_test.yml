@@ -16,7 +16,7 @@ jobs:
           submodules: 'recursive'
 
       - name: Build Project
-        uses: docker://lagerdata/devenv-cortexm-nrf52:version-1.7
+        uses: docker://lagerdata/devenv-cortexm-nrf52:version-1.8
         with:
           entrypoint: lager
           args: exec build
