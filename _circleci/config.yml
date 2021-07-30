@@ -1,13 +1,14 @@
 version: 2.1
 
 jobs:
+  get_project:
+    steps:
+      - checkout
   build:
     docker:
       - image: lagerdata/devenv-cortexm-nrf52:version-1.6
     working_directory: /app
     steps:
-      - run: apt-get install -y git
-      - checkout
       - run: lager exec build
       - store_artifacts:
           path: examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build
