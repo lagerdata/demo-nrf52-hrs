@@ -1,9 +1,10 @@
 [LAGER]
 
 [DEVENV]
-image = lagerdata/devenv-cortexm-nrf52:version-1.8
+image = lagerdata/devenv-cortexm-minimal:version-1.2
 mount_dir = /app
 shell = /bin/bash
 cmd.build = cd examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc;make
 cmd.clean = cd examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc;make clean
+cmd.build-cmake = mkdir -p _build;cd _build;cmake .. -G Ninja;cmake --build .
 
