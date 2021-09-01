@@ -19,13 +19,13 @@ jobs:
         uses: docker://lagerdata/devenv-cortexm-nrf52:version-1.8
         with:
           entrypoint: lager
-          args: exec build
+          args: exec build-cmake
 
       - name: Upload the app hexfile
         uses: actions/upload-artifact@v2
         with:
           name: app_hexfile
-          path: examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build/nrf52840_xxaa.hex
+          path: _build/examples/ble_peripheral/ble_app_hrs/app.hex
 
       - name: Upload the softdevice hexfile
         uses: actions/upload-artifact@v2
@@ -83,7 +83,7 @@ jobs:
           LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
         with:
           entrypoint: lager
-          args: flash --hexfile /github/workspace/nrf52840_xxaa.hex
+          args: flash --hexfile /github/workspace/app.hex
 
   test_ble: #test basic BLE functionality
     runs-on: ubuntu-latest
