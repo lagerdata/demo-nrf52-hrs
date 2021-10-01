@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: test_ble
-          path: tests/
+          path: tests
 
 
   connect:
@@ -100,5 +100,5 @@ jobs:
           LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
           LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
         with:
-          entrypoint: lager
-          args: python tests
+          entrypoint: ls
+          args: -al
