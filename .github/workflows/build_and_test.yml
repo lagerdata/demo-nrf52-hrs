@@ -100,5 +100,5 @@ jobs:
           LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
           LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
         with:
-          entrypoint: ls
-          args: -al
+          entrypoint: lager
+          args: python .
