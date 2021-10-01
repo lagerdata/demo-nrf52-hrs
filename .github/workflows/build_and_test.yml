@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: test_ble
-          path: tests/main.py
+          path: tests/
 
 
   connect:
@@ -85,7 +85,7 @@ jobs:
           entrypoint: lager
           args: flash --hexfile /github/workspace/app.hex
 
-  test_ble: #test basic BLE functionality
+  test_ble: #test BLE functionality
     runs-on: ubuntu-latest
     needs: [flash]
     steps:
@@ -101,4 +101,4 @@ jobs:
           LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
         with:
           entrypoint: lager
-          args: python main.py
+          args: python tests
