@@ -13,7 +13,7 @@ jobs:
       image: docker://lagerdata/devenv-cortexm:version-1.1
       credentials:
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_TOKEN }}
 
 
     steps:
@@ -56,17 +56,15 @@ jobs:
     steps:
       - name: Connect to gateway
         run: lager connect --device nrf52 --force
-        # uses: docker://lagerdata/lager-cli
-        # env:
-        #   LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-        #   LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}     #This is setup inside GitHub see https://docs.lagerdata.com/ci/github_actions.html     
-        # with:
-        #   entrypoint: lager
-        #   args: connect --device nrf52 --force
 
 
   flash: #Only proceed to this step if the build and connect jobs succeeded 
     runs-on: ubuntu-latest
+    image: docker://lagerdata/lager-cli
+    env:
+        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+
     needs: [build, connect]
     steps:
       - name: Download the app hexfile
@@ -80,25 +78,19 @@ jobs:
           name: softdevice_hexfile
 
       - name: Flash Softdevice
-        uses: docker://lagerdata/lager-cli
-        env:
-          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-        with:
-          entrypoint: lager
-          args: flash --hexfile /github/workspace/s140_nrf52_7.2.0_softdevice.hex
+        run: lager flash --hexfile /github/workspace/s140_nrf52_7.2.0_softdevice.hex
 
       - name: Flash App
-        uses: docker://lagerdata/lager-cli
-        env:
-          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-        with:
-          entrypoint: lager
-          args: flash --hexfile /github/workspace/app.hex
+        run: lager flash --hexfile /github/workspace/app.hex
+
 
   test_ble: #test BLE functionality
     runs-on: ubuntu-latest
+    image: docker://lagerdata/lager-cli
+    env:
+        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+
     needs: [flash]
     steps:
       - name: Download ble test
@@ -107,10 +99,4 @@ jobs:
           name: test_ble
 
       - name: Test BLE
-        uses: docker://lagerdata/lager-cli
-        env:
-          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-        with:
-          entrypoint: lager
-          args: python .
+        run: lager python .
