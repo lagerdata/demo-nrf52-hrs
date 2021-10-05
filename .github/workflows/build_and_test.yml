@@ -8,6 +8,14 @@ concurrency:
 
 jobs:
   build:
+    container:
+      image: docker://lagerdata/devenv-cortexm:version-1.1
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
@@ -16,7 +24,7 @@ jobs:
           submodules: 'recursive'
 
       - name: Build Project
-        uses: docker://lagerdata/devenv-cortexm-minimal:version-1.2
+        uses: docker://lagerdata/devenv-cortexm:version-1.1
         with:
           entrypoint: lager
           args: exec build-cmake
