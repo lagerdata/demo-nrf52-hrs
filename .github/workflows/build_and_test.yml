@@ -23,90 +23,90 @@ jobs:
         with:
           submodules: 'recursive'
 
-      # - name: Build Project
-      #   uses: docker://lagerdata/devenv-cortexm:version-1.1
-      #   with:
-      #     entrypoint: lager
-      #     args: exec build-cmake
+      - name: Build Project
+        uses: lagerdata/devenv-cortexm:version-1.1
+        with:
+          entrypoint: lager
+          args: exec build-cmake
 
-      # - name: Upload the app hexfile
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: app_hexfile
-      #     path: _build/examples/ble_peripheral/ble_app_hrs/app.hex
+      - name: Upload the app hexfile
+        uses: actions/upload-artifact@v2
+        with:
+          name: app_hexfile
+          path: _build/examples/ble_peripheral/ble_app_hrs/app.hex
 
-      # - name: Upload the softdevice hexfile
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: softdevice_hexfile
-      #     path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+      - name: Upload the softdevice hexfile
+        uses: actions/upload-artifact@v2
+        with:
+          name: softdevice_hexfile
+          path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
 
-      # - name: Upload ble test
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: test_ble
-      #     path: tests
-
-
-  # connect:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Connect to gateway
-  #       uses: docker://lagerdata/lager-cli
-  #       env:
-  #         LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-  #         LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}     #This is setup inside GitHub see https://docs.lagerdata.com/ci/github_actions.html     
-  #       with:
-  #         entrypoint: lager
-  #         args: connect --device nrf52 --force
+      - name: Upload ble test
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_ble
+          path: tests
 
 
-  # flash: #Only proceed to this step if the build and connect jobs succeeded 
-  #   runs-on: ubuntu-latest
-  #   needs: [build, connect]
-  #   steps:
-  #     - name: Download the app hexfile
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: app_hexfile
+  connect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect to gateway
+        uses: docker://lagerdata/lager-cli
+        env:
+          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}     #This is setup inside GitHub see https://docs.lagerdata.com/ci/github_actions.html     
+        with:
+          entrypoint: lager
+          args: connect --device nrf52 --force
 
-  #     - name: Download the softdevice hexfile
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: softdevice_hexfile
 
-  #     - name: Flash Softdevice
-  #       uses: docker://lagerdata/lager-cli
-  #       env:
-  #         LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-  #         LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-  #       with:
-  #         entrypoint: lager
-  #         args: flash --hexfile /github/workspace/s140_nrf52_7.2.0_softdevice.hex
+  flash: #Only proceed to this step if the build and connect jobs succeeded 
+    runs-on: ubuntu-latest
+    needs: [build, connect]
+    steps:
+      - name: Download the app hexfile
+        uses: actions/download-artifact@v2
+        with:
+          name: app_hexfile
 
-  #     - name: Flash App
-  #       uses: docker://lagerdata/lager-cli
-  #       env:
-  #         LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-  #         LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-  #       with:
-  #         entrypoint: lager
-  #         args: flash --hexfile /github/workspace/app.hex
+      - name: Download the softdevice hexfile
+        uses: actions/download-artifact@v2
+        with:
+          name: softdevice_hexfile
 
-  # test_ble: #test BLE functionality
-  #   runs-on: ubuntu-latest
-  #   needs: [flash]
-  #   steps:
-  #     - name: Download ble test
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: test_ble
+      - name: Flash Softdevice
+        uses: docker://lagerdata/lager-cli
+        env:
+          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+        with:
+          entrypoint: lager
+          args: flash --hexfile /github/workspace/s140_nrf52_7.2.0_softdevice.hex
 
-  #     - name: Test BLE
-  #       uses: docker://lagerdata/lager-cli
-  #       env:
-  #         LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-  #         LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-  #       with:
-  #         entrypoint: lager
-  #         args: python .
+      - name: Flash App
+        uses: docker://lagerdata/lager-cli
+        env:
+          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+        with:
+          entrypoint: lager
+          args: flash --hexfile /github/workspace/app.hex
+
+  test_ble: #test BLE functionality
+    runs-on: ubuntu-latest
+    needs: [flash]
+    steps:
+      - name: Download ble test
+        uses: actions/download-artifact@v2
+        with:
+          name: test_ble
+
+      - name: Test BLE
+        uses: docker://lagerdata/lager-cli
+        env:
+          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+        with:
+          entrypoint: lager
+          args: python .
