@@ -24,7 +24,10 @@ jobs:
           submodules: 'recursive'
 
       - name: Build Project
-        uses: lagerdata/devenv-cortexm:version-1.1
+        uses: docker://lagerdata/devenv-cortexm:version-1.1
+        credentials:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}        
         with:
           entrypoint: lager
           args: exec build-cmake
