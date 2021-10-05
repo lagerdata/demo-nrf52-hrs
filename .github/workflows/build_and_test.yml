@@ -9,6 +9,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: docker://lagerdata/devenv-cortexm-minimal:version-1.2
+
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -16,89 +19,88 @@ jobs:
           submodules: 'recursive'
 
       - name: Build Project
-        uses: docker://lagerdata/devenv-cortexm-minimal:version-1.2
-        with:
-          entrypoint: lager
-          args: exec build-cmake
+        run: lager exec build-cmake
+
 
       - name: Upload the app hexfile
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2.2.4
         with:
           name: app_hexfile
           path: _build/examples/ble_peripheral/ble_app_hrs/app.hex
+          if-no-files-found: error
 
       - name: Upload the softdevice hexfile
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2.2.4
         with:
           name: softdevice_hexfile
           path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+          if-no-files-found: error
 
       - name: Upload ble test
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2.2.4
         with:
           name: test_ble
           path: tests
+          if-no-files-found: error
 
 
   connect:
     runs-on: ubuntu-latest
+    container:
+      image: docker://lagerdata/lager-cli
+      env:
+        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }} 
+
     steps:
       - name: Connect to gateway
-        uses: docker://lagerdata/lager-cli
-        env:
-          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}     #This is setup inside GitHub see https://docs.lagerdata.com/ci/github_actions.html     
-        with:
-          entrypoint: lager
-          args: connect --device nrf52 --force
+        run: lager connect --device nrf52 --force
 
 
   flash: #Only proceed to this step if the build and connect jobs succeeded 
     runs-on: ubuntu-latest
+    container:
+      image: docker://lagerdata/lager-cli
+      env:
+        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+
     needs: [build, connect]
     steps:
       - name: Download the app hexfile
         uses: actions/download-artifact@v2
         with:
           name: app_hexfile
+          path: /tmp
 
       - name: Download the softdevice hexfile
         uses: actions/download-artifact@v2
         with:
           name: softdevice_hexfile
+          path: /tmp
 
       - name: Flash Softdevice
-        uses: docker://lagerdata/lager-cli
-        env:
-          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-        with:
-          entrypoint: lager
-          args: flash --hexfile /github/workspace/s140_nrf52_7.2.0_softdevice.hex
+        run: lager flash --hexfile /tmp/s140_nrf52_7.2.0_softdevice.hex
 
       - name: Flash App
-        uses: docker://lagerdata/lager-cli
-        env:
-          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-        with:
-          entrypoint: lager
-          args: flash --hexfile /github/workspace/app.hex
+        run: lager flash --hexfile /tmp/app.hex
+
 
   test_ble: #test BLE functionality
     runs-on: ubuntu-latest
+    container:
+      image: docker://lagerdata/lager-cli
+      env:
+        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+
     needs: [flash]
     steps:
       - name: Download ble test
         uses: actions/download-artifact@v2
         with:
           name: test_ble
+          path: /tmp/tests
 
       - name: Test BLE
-        uses: docker://lagerdata/lager-cli
-        env:
-          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
-        with:
-          entrypoint: lager
-          args: python .
+        run: lager python /tmp/tests
