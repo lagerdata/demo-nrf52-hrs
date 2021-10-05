@@ -79,10 +79,10 @@ jobs:
           name: softdevice_hexfile
 
       - name: Flash Softdevice
-        run: lager flash --hexfile /github/workspace/s140_nrf52_7.2.0_softdevice.hex
+        run: lager flash --hexfile s140_nrf52_7.2.0_softdevice.hex
 
       - name: Flash App
-        run: lager flash --hexfile /github/workspace/app.hex
+        run: lager flash --hexfile app.hex
 
 
   test_ble: #test BLE functionality
