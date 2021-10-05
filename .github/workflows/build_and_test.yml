@@ -60,8 +60,9 @@ jobs:
 
   flash: #Only proceed to this step if the build and connect jobs succeeded 
     runs-on: ubuntu-latest
-    image: docker://lagerdata/lager-cli
-    env:
+    container:
+      image: docker://lagerdata/lager-cli
+      env:
         LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
         LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
 
@@ -86,8 +87,9 @@ jobs:
 
   test_ble: #test BLE functionality
     runs-on: ubuntu-latest
-    image: docker://lagerdata/lager-cli
-    env:
+    container:
+      image: docker://lagerdata/lager-cli
+      env:
         LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
         LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
 
