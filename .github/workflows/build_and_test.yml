@@ -47,15 +47,22 @@ jobs:
 
   connect:
     runs-on: ubuntu-latest
+    container:
+      image: docker://lagerdata/lager-cli
+      env:
+        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }} 
+
     steps:
       - name: Connect to gateway
-        uses: docker://lagerdata/lager-cli
-        env:
-          LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-          LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}     #This is setup inside GitHub see https://docs.lagerdata.com/ci/github_actions.html     
-        with:
-          entrypoint: lager
-          args: connect --device nrf52 --force
+        run: lager connect --device nrf52 --force
+        # uses: docker://lagerdata/lager-cli
+        # env:
+        #   LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+        #   LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}     #This is setup inside GitHub see https://docs.lagerdata.com/ci/github_actions.html     
+        # with:
+        #   entrypoint: lager
+        #   args: connect --device nrf52 --force
 
 
   flash: #Only proceed to this step if the build and connect jobs succeeded 
