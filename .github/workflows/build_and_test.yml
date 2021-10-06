@@ -29,26 +29,23 @@ jobs:
       - name: Upload the app hexfile
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: hexes_and_tests
-          path: |
-            _build/examples/ble_peripheral/ble_app_hrs/app.hex
-            components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
-            tests
+          name: app_hexfile
+          path: _build/examples/ble_peripheral/ble_app_hrs/app.hex
           if-no-files-found: error
 
-      # - name: Upload the softdevice hexfile
-      #   uses: actions/upload-artifact@v2.2.4
-      #   with:
-      #     name: softdevice_hexfile
-      #     path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
-      #     if-no-files-found: error
+      - name: Upload the softdevice hexfile
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: softdevice_hexfile
+          path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+          if-no-files-found: error
 
-      # - name: Upload ble test
-      #   uses: actions/upload-artifact@v2.2.4
-      #   with:
-      #     name: test_ble
-      #     path: tests
-      #     if-no-files-found: error
+      - name: Upload ble test
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: test_ble
+          path: tests
+          if-no-files-found: error
 
 
   connect:
@@ -74,40 +71,40 @@ jobs:
 
     needs: [build, connect]
     steps:
-      - name: Download the hex files and python tests
+      - name: Download the app hexfile
         uses: actions/download-artifact@v2
         with:
-          name: hexes_and_tests
+          name: app_hexfile
           path: /tmp
 
-      - name: List files in tmp
-        run: ls /tmp -al
-      # - name: Download the softdevice hexfile
-      #   uses: actions/download-artifact@v2
-      #   with:
-      #     name: softdevice_hexfile
+      - name: Download the softdevice hexfile
+        uses: actions/download-artifact@v2
+        with:
+          name: softdevice_hexfile
+          path: /tmp
 
-      # - name: Flash Softdevice
-      #   run: lager flash --hexfile s140_nrf52_7.2.0_softdevice.hex
+      - name: Flash Softdevice
+        run: lager flash --hexfile /tmp/s140_nrf52_7.2.0_softdevice.hex
 
-      # - name: Flash App
-      #   run: lager flash --hexfile app.hex
+      - name: Flash App
+        run: lager flash --hexfile /tmp/app.hex
 
 
-  # test_ble: #test BLE functionality
-  #   runs-on: ubuntu-latest
-  #   container:
-  #     image: docker://lagerdata/lager-cli
-  #     env:
-  #       LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-  #       LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+  test_ble: #test BLE functionality
+    runs-on: ubuntu-latest
+    container:
+      image: docker://lagerdata/lager-cli
+      env:
+        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
 
-  #   needs: [flash]
-  #   steps:
-  #     - name: Download ble test
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: test_ble
+    needs: [flash]
+    steps:
+      - name: Download ble test
+        uses: actions/download-artifact@v2
+        with:
+          name: test_ble
+          path: /tmp
 
-  #     - name: Test BLE
-  #       run: lager python .
+      - name: Test BLE
+        run: lager python /tmp
