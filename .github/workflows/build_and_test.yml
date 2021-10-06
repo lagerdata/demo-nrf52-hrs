@@ -22,6 +22,15 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Caches files for use in flashing and testing
+        uses: actions/cache@v2
+        with:
+          path: |
+            _build/examples/ble_peripheral/ble_app_hrs
+            components/softdevice/s140
+            tests
+          key: ${{ runner.os }}-hexes-tests
+
       - name: Build Project
         run: lager exec build-cmake
 
@@ -36,14 +45,6 @@ jobs:
             tests
           if-no-files-found: error
 
-      - name: Caches files for use in flashing and testing
-        uses: actions/cache@v2
-        with:
-          path: |
-            _build/examples/ble_peripheral/ble_app_hrs
-            components/softdevice/s140
-            tests
-          key: ${{ runner.os }}-hexes-tests
 
       # - name: Upload the softdevice hexfile
       #   uses: actions/upload-artifact@v2.2.4
