@@ -80,6 +80,8 @@ jobs:
           name: hexes_and_tests
           path: /tmp
 
+      - name: List files in tmp
+        run: ls /tmp -al
       # - name: Download the softdevice hexfile
       #   uses: actions/download-artifact@v2
       #   with:
