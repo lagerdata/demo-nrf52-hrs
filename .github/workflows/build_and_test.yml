@@ -107,4 +107,5 @@ jobs:
           path: /tmp
 
       - name: Test BLE
-        run: lager python /tmp
+        run: ls /tmp -al
+        # run: lager python /tmp
