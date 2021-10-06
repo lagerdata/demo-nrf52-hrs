@@ -27,22 +27,28 @@ jobs:
 
 
       - name: Upload the app hexfile
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2.2.4
         with:
-          name: app_hexfile
-          path: _build/examples/ble_peripheral/ble_app_hrs/app.hex
+          name: hexes_and_tests
+          path: |
+            _build/examples/ble_peripheral/ble_app_hrs/app.hex
+            components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+            tests
+          if-no-files-found: error
 
-      - name: Upload the softdevice hexfile
-        uses: actions/upload-artifact@v2
-        with:
-          name: softdevice_hexfile
-          path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+      # - name: Upload the softdevice hexfile
+      #   uses: actions/upload-artifact@v2.2.4
+      #   with:
+      #     name: softdevice_hexfile
+      #     path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+      #     if-no-files-found: error
 
-      - name: Upload ble test
-        uses: actions/upload-artifact@v2
-        with:
-          name: test_ble
-          path: tests
+      # - name: Upload ble test
+      #   uses: actions/upload-artifact@v2.2.4
+      #   with:
+      #     name: test_ble
+      #     path: tests
+      #     if-no-files-found: error
 
 
   connect:
@@ -68,18 +74,15 @@ jobs:
 
     needs: [build, connect]
     steps:
-      - name: Download the app hexfile
+      - name: Download the hex files and python tests
         uses: actions/download-artifact@v2
         with:
-          name: app_hexfile
+          name: hexes_and_tests
 
-      - name: Download the softdevice hexfile
-        uses: actions/download-artifact@v2
-        with:
-          name: softdevice_hexfile
-
-      - name: list files
-        run: ls -al
+      # - name: Download the softdevice hexfile
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: softdevice_hexfile
 
       # - name: Flash Softdevice
       #   run: lager flash --hexfile s140_nrf52_7.2.0_softdevice.hex
