@@ -104,8 +104,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test_ble
-          path: /tmp
+          path: /tmp/tests
 
       - name: Test BLE
-        run: ls /tmp -al
-        # run: lager python /tmp
+        run: lager python /tmp/tests
