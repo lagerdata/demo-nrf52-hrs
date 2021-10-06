@@ -77,7 +77,8 @@ jobs:
       - name: Download the hex files and python tests
         uses: actions/download-artifact@v2
         with:
-          name: hexes_and_tests.zip
+          name: hexes_and_tests
+          path: ~/
 
       # - name: Download the softdevice hexfile
       #   uses: actions/download-artifact@v2
