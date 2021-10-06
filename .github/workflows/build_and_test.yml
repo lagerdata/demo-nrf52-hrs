@@ -78,27 +78,30 @@ jobs:
         with:
           name: softdevice_hexfile
 
-      - name: Flash Softdevice
-        run: lager flash --hexfile s140_nrf52_7.2.0_softdevice.hex
+      - name: list files
+        run: ls -al
 
-      - name: Flash App
-        run: lager flash --hexfile app.hex
+      # - name: Flash Softdevice
+      #   run: lager flash --hexfile s140_nrf52_7.2.0_softdevice.hex
+
+      # - name: Flash App
+      #   run: lager flash --hexfile app.hex
 
 
-  test_ble: #test BLE functionality
-    runs-on: ubuntu-latest
-    container:
-      image: docker://lagerdata/lager-cli
-      env:
-        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+  # test_ble: #test BLE functionality
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: docker://lagerdata/lager-cli
+  #     env:
+  #       LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+  #       LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
 
-    needs: [flash]
-    steps:
-      - name: Download ble test
-        uses: actions/download-artifact@v2
-        with:
-          name: test_ble
+  #   needs: [flash]
+  #   steps:
+  #     - name: Download ble test
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: test_ble
 
-      - name: Test BLE
-        run: lager python .
+  #     - name: Test BLE
+  #       run: lager python .
