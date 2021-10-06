@@ -36,6 +36,15 @@ jobs:
             tests
           if-no-files-found: error
 
+      - name: Caches files for use in flashing and testing
+        uses: actions/cache@v2
+        with:
+          path: |
+            _build/examples/ble_peripheral/ble_app_hrs
+            components/softdevice/s140
+            tests
+          key: ${{ runner.os }}-hexes-tests
+
       # - name: Upload the softdevice hexfile
       #   uses: actions/upload-artifact@v2.2.4
       #   with:
@@ -74,10 +83,12 @@ jobs:
 
     needs: [build, connect]
     steps:
-      - name: Download the hex files and python tests
-        uses: actions/download-artifact@v2
-        with:
-          name: hexes_and_tests
+      - name: list files
+        run: ls -al
+      # - name: Download the hex files and python tests
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: hexes_and_tests
 
       # - name: Download the softdevice hexfile
       #   uses: actions/download-artifact@v2
