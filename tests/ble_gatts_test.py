@@ -1,3 +1,4 @@
+from lager import lager
 from lager.ble import Central
 
 
@@ -78,3 +79,25 @@ def test_gatts_table_dis(central, device):
         for char in di_service.characteristics:
             if char.uuid == MFG_NAME_STRING_CHAR:
                 assert char.properties[0] == 'read'      
+
+
+def main():
+    gateway = lager.Lager()
+    dut = gateway.connect("nrf52",interface="ftdi",transport="swd",speed=3000)
+    print(f"Connected to DUT:{dut}")
+
+    #reset device
+    dut.reset()
+
+    central = Central()
+    device = central.scan(name='Nordic_HRM')
+    display_gatts_table(central, device)
+    test_gatts_table_hrm(central, device)
+    test_gatts_table_battery(central, device)
+    test_gatts_table_dis(central, device)
+
+    print("Brilliant!")
+    dut.close()
+
+if __name__ == '__main__':
+     main()

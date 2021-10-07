@@ -1,3 +1,4 @@
+from lager import lager
 from lager.ble import Central
 
 HRM_SERVICE = "0000180d-0000-1000-8000-00805f9b34fb"
@@ -68,3 +69,25 @@ def test_dis_read(central, device):
             raise SystemExit("No Services Found")     
         val = client.read_gatt_char(MFG_NAME_STRING_CHAR).decode("utf-8")
         assert val == 'NordicSemiconductor'
+
+
+
+def main():
+    gateway = lager.Lager()
+    dut = gateway.connect("nrf52",interface="ftdi",transport="swd",speed=3000)
+    print(f"Connected to DUT:{dut}")
+
+    #reset device
+    dut.reset()
+
+    central = Central()
+    device = central.scan(name='Nordic_HRM')
+    test_hrm_notifications(central, device)
+    test_batt_notifications(central, device)
+    test_dis_read(central, device)    
+
+    print("Brilliant!")
+    dut.close()
+
+if __name__ == '__main__':
+     main()

@@ -1,3 +1,4 @@
+from lager import lager
 from lager.ble import Central
 
 
@@ -12,3 +13,20 @@ def test_scan(central, dev_name):
 
 	print(f"Device Info: {device}")
 	return device
+
+def main():
+    gateway = lager.Lager()
+    dut = gateway.connect("nrf52",interface="ftdi",transport="swd",speed=3000)
+    print(f"Connected to DUT:{dut}")
+
+    #reset device
+    dut.reset()
+
+    central = Central()
+    device = test_scan(central, 'Nordic_HRM')
+
+    print("Brilliant!")
+    dut.close()
+
+if __name__ == '__main__':
+     main()
