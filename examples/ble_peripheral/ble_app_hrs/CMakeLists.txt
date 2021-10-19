@@ -282,7 +282,9 @@ target_link_libraries(app "${NRF52_SDK_ROOT_DIR}/external/nrf_oberon/lib/cortex-
 target_compile_options(app PRIVATE -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16)
 target_compile_options(app PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wall -Werror -g3 -O3 -gstrict-dwarf -ffunction-sections -fdata-sections -fno-strict-aliasing -fno-builtin -fshort-enums>)
 target_compile_options(app PRIVATE $<$<COMPILE_LANGUAGE:ASM>:-x assembler-with-cpp -g3>)
-target_compile_options(app PRIVATE "-ffile-prefix-map=/app=.")
+
+target_compile_options(app PRIVATE "-fdebug-prefix-map=/app=.")
+target_compile_options(app PRIVATE "-fmacro-prefix-map=/app=.")
 
 target_compile_definitions(app PRIVATE FLOAT_ABI_HARD
 	NRF52840_XXAA
