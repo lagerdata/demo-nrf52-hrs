@@ -1,7 +1,7 @@
 name: Workflow for building and running some simple hardware tests
 on: [push]
 env:
-  LAGER_GATEWAY: 113
+  LAGER_GATEWAY: 45
 concurrency: 
   group: dut
   cancel-in-progress: false
@@ -19,7 +19,7 @@ jobs:
           submodules: 'recursive'
 
       - name: Build Project
-        run: lager exec build-cmake
+        run: lager exec build
 
       - name: Upload the app hexfile
         uses: actions/upload-artifact@v2.2.4
