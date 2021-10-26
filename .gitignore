@@ -53,5 +53,4 @@ dkms.conf
 
 **/_build
 **/_build/**
-docker-sync.yml
 .docker-sync
