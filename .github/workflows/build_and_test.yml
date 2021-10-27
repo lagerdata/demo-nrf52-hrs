@@ -4,7 +4,7 @@ on:
   schedule:
     # * is a special character in YAML so you have to quote this string
     # run this build every night at 8:00pm Pacific time, 20h+(8 for UTC)
-    - cron:  '15 * * * *'
+    - cron:  '* * * * *'
 
 env:
   LAGER_GATEWAY: 45
@@ -13,43 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: docker://lagerdata/devenv-cortexm-minimal:version-1.2
-
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-
-      - name: Build Project
-        run: lager exec build
-
-      - name: Upload the app hexfile
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: app_hexfile
-          path: _build/examples/ble_peripheral/ble_app_hrs/app.hex
-          if-no-files-found: error
-
-      - name: Upload the softdevice hexfile
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: softdevice_hexfile
-          path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
-          if-no-files-found: error
-
-      - name: Upload ble test
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: test_ble
-          path: tests
-          if-no-files-found: error
-
-
-  connect:
+  hello:
     runs-on: ubuntu-latest
     container:
       image: docker://lagerdata/lager-cli
@@ -58,54 +22,101 @@ jobs:
         LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }} 
 
     steps:
-      - name: Connect to gateway
-        run: lager connect --device nrf52 --force
+      - name: Say hello to gateway
+        run: lager gateway hello  
+  # build:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: docker://lagerdata/devenv-cortexm-minimal:version-1.2
+
+  #   steps:
+  #     - name: Checkout the code
+  #       uses: actions/checkout@v2
+  #       with:
+  #         submodules: 'recursive'
+
+  #     - name: Build Project
+  #       run: lager exec build
+
+  #     - name: Upload the app hexfile
+  #       uses: actions/upload-artifact@v2.2.4
+  #       with:
+  #         name: app_hexfile
+  #         path: _build/examples/ble_peripheral/ble_app_hrs/app.hex
+  #         if-no-files-found: error
+
+  #     - name: Upload the softdevice hexfile
+  #       uses: actions/upload-artifact@v2.2.4
+  #       with:
+  #         name: softdevice_hexfile
+  #         path: components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+  #         if-no-files-found: error
+
+  #     - name: Upload ble test
+  #       uses: actions/upload-artifact@v2.2.4
+  #       with:
+  #         name: test_ble
+  #         path: tests
+  #         if-no-files-found: error
 
 
-  flash: #Only proceed to this step if the build and connect jobs succeeded 
-    runs-on: ubuntu-latest
-    container:
-      image: docker://lagerdata/lager-cli
-      env:
-        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+  # connect:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: docker://lagerdata/lager-cli
+  #     env:
+  #       LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+  #       LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }} 
 
-    needs: [build, connect]
-    steps:
-      - name: Download the app hexfile
-        uses: actions/download-artifact@v2
-        with:
-          name: app_hexfile
-          path: /tmp
-
-      - name: Download the softdevice hexfile
-        uses: actions/download-artifact@v2
-        with:
-          name: softdevice_hexfile
-          path: /tmp
-
-      - name: Flash Softdevice
-        run: lager flash --hexfile /tmp/s140_nrf52_7.2.0_softdevice.hex
-
-      - name: Flash App
-        run: lager flash --hexfile /tmp/app.hex
+  #   steps:
+  #     - name: Connect to gateway
+  #       run: lager connect --device nrf52 --force
 
 
-  test_ble: #test BLE functionality
-    runs-on: ubuntu-latest
-    container:
-      image: docker://lagerdata/lager-cli
-      env:
-        LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
-        LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+  # flash: #Only proceed to this step if the build and connect jobs succeeded 
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: docker://lagerdata/lager-cli
+  #     env:
+  #       LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+  #       LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
 
-    needs: [flash]
-    steps:
-      - name: Download ble test
-        uses: actions/download-artifact@v2
-        with:
-          name: test_ble
-          path: /tmp/tests
+  #   needs: [build, connect]
+  #   steps:
+  #     - name: Download the app hexfile
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: app_hexfile
+  #         path: /tmp
 
-      - name: Test BLE
-        run: lager python /tmp/tests
+  #     - name: Download the softdevice hexfile
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: softdevice_hexfile
+  #         path: /tmp
+
+  #     - name: Flash Softdevice
+  #       run: lager flash --hexfile /tmp/s140_nrf52_7.2.0_softdevice.hex
+
+  #     - name: Flash App
+  #       run: lager flash --hexfile /tmp/app.hex
+
+
+  # test_ble: #test BLE functionality
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: docker://lagerdata/lager-cli
+  #     env:
+  #       LAGER_TOKEN_ID: ${{ secrets.LAGER_TOKEN_ID }} 
+  #       LAGER_TOKEN_SECRET: ${{ secrets.LAGER_TOKEN_SECRET }}
+
+  #   needs: [flash]
+  #   steps:
+  #     - name: Download ble test
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: test_ble
+  #         path: /tmp/tests
+
+  #     - name: Test BLE
+  #       run: lager python /tmp/tests
