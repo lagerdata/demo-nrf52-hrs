@@ -4,7 +4,7 @@ on:
   schedule:
     # * is a special character in YAML so you have to quote this string
     # run this build every night at 8:00pm Pacific time, 20h+(8 for UTC)
-    - cron:  '* * * * *'
+    - cron:  '5 * * * *'
 
 env:
   LAGER_GATEWAY: 45
