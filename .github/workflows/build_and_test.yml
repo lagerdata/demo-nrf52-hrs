@@ -7,7 +7,7 @@ on:
   #   - cron:  '5 * * * *'
 
 env:
-  LAGER_GATEWAY: 45
+  LAGER_GATEWAY: ${{secrets.LAGER_GATEWAY}}
 concurrency: 
   group: dut
   cancel-in-progress: false
