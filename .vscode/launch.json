@@ -5,26 +5,39 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb-multiarch) Launch",
+            "name": "Lager Debugger",
             "type": "cppdbg",
             "request": "launch",
-            "miDebuggerPath": "/usr/bin/gdb-multiarch",
-            "miDebuggerArgs": "--cd=${workspaceFolder} --nx",
-            "MIMode": "gdb", 
+            "program": "${workspaceFolder}/.vscode_dummy",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "lager",
+            "miDebuggerArgs": "debug _build/examples/ble_peripheral/ble_app_hrs/app --cwd ${workspaceFolder}",
             "targetArchitecture": "arm",
-            "program": "${workspaceFolder}/examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build/nrf52840_xxaa.out", 
-             "setupCommands": [
+            "logging": { "engineLogging": true },
+            "ignoreFailures": true,
+            "stopAtConnect" : true,
+            "customLaunchSetupCommands": [
+                {
+                  "description": "Enable pretty-printing for gdb",
+                  "text": "-enable-pretty-printing",
+                  "ignoreFailures": true
+                },
                 {"text": "set remotetimeout 5"},
                 {"text": "target remote localhost:3333"},
-                {"text": "monitor reset halt"},
-                {"text": "file './examples/ble_peripheral/ble_app_hrs/pca10056/s140/armgcc/_build/nrf52840_xxaa.out'"},
+                {"text": "monitor reset halt"}
                 {"text": "load"},
                 {"text": "monitor reset halt"},
                 {"text": "break main","ignoreFailures": true}
-            ],
+              ],
+            "preLaunchTask": "lager",
             "launchCompleteCommand": "None",
-            "externalConsole": false,
-            "cwd": "${workspaceFolder}"
+
+
         }
     ]
 }
